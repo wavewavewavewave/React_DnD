@@ -7,32 +7,41 @@ import {Column} from "./components/Column";
 
 
 const App = () => {
-    const [isFirstColumn, setIsFirstColumn] = useState(true);
     const [items, setItems] = useState([
         {id: 1, name: 'Item 1', column: 'Column 1'},
         {id: 2, name: 'Item 2', column: 'Column 1'},
         {id: 3, name: 'Item 3', column: 'Column 1'},
     ])
 
+    const moveCardHandler = (dragIndex, hoverIndex) => {
+        const dragItem = items[dragIndex]
+
+        if (dragItem) {
+            setItems((prevState => {
+                const coppiedStateArray = [...prevState]
+                const prevItem = coppiedStateArray.splice(hoverIndex, 1, dragItem)
+                coppiedStateArray.splice(dragIndex, 1, prevItem[0])
+                return coppiedStateArray;
+            }))
+        }
+    }
+
     const returnItemsForColumns = (columnName) => {
         return items
             .filter((item) => item.column === columnName)
-            .map((item) => (
-                <MovableItem key={item.id} name={item.name} setItems={setItems}/>
+            .map((item, index) => (
+                <MovableItem key={item.id} name={item.name} setItems={setItems} index={index}
+                             moveCardHandler={moveCardHandler}/>
             ))
     }
-
-    // const Item = <MovableItem name={items} setIsFirstColumn={setIsFirstColumn} setItems={setItems}/>;
 
     return (
         <div className="container">
             <DndProvider backend={HTML5Backend}>
                 <Column title='Column 1' className='column first-column'>
-                    {/*{isFirstColumn && Item}*/}
                     {returnItemsForColumns('Column 1')}
                 </Column>
                 <Column title='Column 2' className='column second-column'>
-                    {/*{!isFirstColumn && Item}*/}
                     {returnItemsForColumns('Column 2')}
                 </Column>
             </DndProvider>
